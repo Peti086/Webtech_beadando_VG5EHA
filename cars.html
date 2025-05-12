@@ -1,0 +1,188 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Autók lista</title>
+    <link rel="stylesheet" href="style.css">
+</head>
+
+<body>
+    <h4>Autók</h4>
+    <div class="container">
+        <div class="row">
+            <div class="col">
+                <table id="car-list">
+                    <tr>
+                        <th>ID</th>
+                        <th>Márka</th>
+                        <th>Model</th>
+                        <th>Elektromos</th>
+                        <th>Fogyasztás</th>
+                        <th>Megbízás napja</th>
+                        <th>Tulajdonos</th>
+                    </tr>
+                </table>
+            </div>
+        </div>
+        <p>Opciók:</p>
+        <button id="modify-btn" class="btn btn-green">Módosítás</button>
+        <button id="new-btn" class="btn btn-secondary">Új autó felvétele</button>
+        <button id="delete-btn" class="btn btn-danger">Törlés</button>
+        <button id="back-btn" class="btn btn-primary">Vissza a kereséshez</button>
+
+        <div id="input-container" style="display: none;">
+            <input id="idInput" type="text" placeholder="Adja meg az ID-t">
+            <button id="finalDelete-btn" class="btn btn-danger">Törlés</button>
+        </div>
+    </div>
+
+    <script>
+        async function listCars(neptun) {
+            try {
+                const res = await fetch(`https://iit-playground.arondev.hu/api/${neptun}/car`)
+
+                if (!res.ok) {
+                    throw 'Server error occurred, status code: ' + res.status;
+                    return;
+                }
+
+                const data = await res.json();
+
+                const tableElem = document.querySelector('#car-list');
+
+                for (const car of data) {
+                    const carHtml = `
+                        <tr class="car-row" data-id="${car.id}">
+                            <td>${car.id}</td>
+                            <td>${car.brand}</td>
+                            <td>${car.model}</td>
+                            <td>${car.electric ? "Igen" : "Nem"}</td>
+                            <td>${car.fuelUse}</td>
+                            <td>${car.dayOfCommission}</td>
+                            <td>${car.owner}</td>
+                        </tr>
+                    `;
+                    tableElem.innerHTML += carHtml;
+                }
+            } catch (err) {
+
+                if (typeof err == 'string') {
+                    alert(err);
+                }
+
+                console.error(err);
+            }
+
+        }
+
+        async function ListCarByID(neptun, id) {
+
+            try {
+                const res = await fetch(`https://iit-playground.arondev.hu/api/${neptun}/car/${id}`)
+
+                if (!res.ok) {
+                    throw 'Server error occurred, status code: ' + res.status;
+                    return;
+                }
+
+                const data = await res.json();
+
+                const tableElem = document.querySelector('#car-list');
+
+                const carHtml = `
+                        <tr class="car-row" data-id="${data.id}">
+                            <td>${data.id}</td>
+                            <td>${data.brand}</td>
+                            <td>${data.model}</td>
+                            <td>${data.electric ? "Igen" : "Nem"}</td>
+                            <td>${data.fuelUse}</td>
+                            <td>${data.dayOfCommission}</td>
+                            <td>${data.owner}</td>
+                        </tr>
+                    `;
+                tableElem.innerHTML += carHtml;
+                
+            } catch (err) {
+
+                if (typeof err == 'string') {
+                    alert(err);
+                }
+
+                console.error(err);
+            }
+        }
+
+        async function deleteCarByID(id, neptun) {
+            try {
+                const res = await fetch(`https://iit-playground.arondev.hu/api/${neptun}/car/${id}`, {
+                    method: 'DELETE'
+                });
+
+                if (!res.ok) {
+                    const error = await res.json();
+                    alert(error.message);
+                    return;
+                }
+
+                const delElem = document.querySelector(`.car-row[data-id="${id}"]`);
+                delElem.remove();
+
+            } catch (err) {
+                alert('Unexpected server error.');
+                console.error(err);
+            }
+        }
+
+
+        const urlParams = new URLSearchParams(window.location.search);
+        const neptun = urlParams.get('name');
+        const carId = urlParams.get('id');
+
+        if (carId) {
+            ListCarByID(neptun, carId);
+        } else {
+            listCars(neptun);
+        }
+
+        const backBtn = document.querySelector('#back-btn');
+        backBtn.addEventListener('click', () => {
+            window.location.href = 'index.html';
+        });
+
+        const newBtn = document.querySelector('#new-btn');
+        newBtn.addEventListener('click', () => {
+            window.location.href = 'new-car.html';
+        });
+
+        const delBtn = document.querySelector('#delete-btn');
+        const inputContainer = document.querySelector('#input-container');
+        delBtn.addEventListener('click', () => {
+            if (inputContainer.style.display == 'none') {
+                inputContainer.style.display = 'block';
+            } else {
+                inputContainer.style.display = 'none';
+            }
+        })
+
+        const finDelBtn = document.querySelector('#finalDelete-btn');
+        finDelBtn.addEventListener('click', () => {
+            const idInp = document.querySelector('#idInput');
+            const id = idInp.value;
+
+            if (!id) {
+                alert("Kérjük, adjon meg egy érvényes ID-t!");
+                return;
+            }
+
+            deleteCarByID(id, neptun);
+            inputContainer.style.display = 'none';
+        });
+
+        const modBtn = document.querySelector('#modify-btn');
+        modBtn.addEventListener('click', () => {
+            window.location.href = 'modify-car.html';
+        });
+    </script>
+</body>

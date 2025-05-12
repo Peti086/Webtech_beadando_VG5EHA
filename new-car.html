@@ -1,0 +1,109 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Új autó hozzáadása</title>
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+    <div>
+        <h1>Új autó hozzáadása</h1>
+
+        <label for="neptun-name">Neptunkód:</label>
+        <input type="text" id="neptun-name" placeholder="Adj meg egy neptunkódot">
+
+        <div>
+            <label for="brand">Márka:</label>
+            <input type="text" id="brand" placeholder="Adja meg az új autó márkáját">
+        </div>
+
+        <div>
+            <label for="model">Model:</label>
+            <input type="text" id="model" placeholder="Adja meg az új autó modeljét">
+        </div>
+
+        <div>
+            <label for="electric">Elektromos-e:</label>
+            <input type="text" id="electric" placeholder="Adja meg, hogy az új elektromos-e(Igen/Nem)">
+        </div>
+
+        <div>
+            <label for="useFuel">Fogyasztás:</label>
+            <input type="text" id="useFuel" placeholder="Adja meg az új autó fogyasztását">
+        </div>
+
+        <div>
+            <label for="dayOfCommission">Megbízás napja:</label>
+            <input type="text" id="dayOfCommission" placeholder="Adja meg a megbízási napot">
+        </div>
+
+        <div>
+            <label for="owner">Tulajdonos:</label>
+            <input type="text" id="owner" placeholder="Adja meg az új autó tulaját">
+        </div>
+
+        <button class="btn btn-secondary" id="new-btn">Adat felvitele</button>
+    </div>
+    <script>
+        async function createCar(car, neptun) {
+            try {
+                const res = await fetch(`https://iit-playground.arondev.hu/api/${neptun}/car`, {
+                    method: 'POST',
+                    headers: {
+                        "Content-Type": "application/json"
+                    },
+                    body: JSON.stringify(car)
+                });
+
+                if (!res.ok) {
+                    const error = await res.json();
+                    alert(error.message);
+                    return;
+                }
+
+                const carCreated = await res.json();
+            } catch (err) {
+                alert('Unexpected server error.');
+                console.error(err);
+            }
+        }
+
+        const newBtn = document.querySelector('#new-btn');
+        newBtn.addEventListener('click', () => {
+
+            const neptunElem = document.querySelector('#neptun-name');
+            const neptun = neptunElem.value;
+
+            const brandElem = document.querySelector('#brand');
+            const brand = brandElem.value;
+
+            const modelElem = document.querySelector('#model');
+            const model = modelElem.value;
+
+            const electricElem = document.querySelector('#electric');
+            const electric = electricElem.value == "Igen" ? true : false;
+
+            const fuelUseElem = document.querySelector('#useFuel');
+            const fuelUse = fuelUseElem.value;
+
+            const commissionElem = document.querySelector('#dayOfCommission');
+            const dayOfCommission = commissionElem.value;
+
+            const ownerElem = document.querySelector('#owner');
+            const owner = ownerElem.value;
+
+            const car = {
+                brand: brand,
+                model: model,
+                electric: electric,
+                fuelUse: fuelUse,
+                dayOfCommission: dayOfCommission,
+                owner: owner
+            };
+
+            createCar(car, neptun);
+        });
+    </script>
+</body>
+</html>

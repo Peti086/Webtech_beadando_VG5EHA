@@ -1,0 +1,40 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Cars - keresés</title>
+    <link rel="stylesheet" href="style.css">
+</head>
+
+<body>
+
+    <h4>Kocsik keresése</h4>
+
+    <label for="neptun-name">Neptunkód:</label>
+    <input type="text" id="neptun-name" placeholder="Adj meg egy neptunkódot">
+
+    <label for="id-name">ID:(opcionális, szűréshez)</label>
+    <input type="text" id="id-name" placeholder="Adj meg egy ID-t">
+
+    <button id="search-btn" class="btn btn-primary">Keresés</button>
+
+    <div id="results"></div>
+
+    <script>
+
+        const searchBtn = document.querySelector('#search-btn');
+        searchBtn.addEventListener('click', () => {
+            const searchText = document.querySelector('#neptun-name').value;
+            const idText = document.querySelector('#id-name').value;
+            const url = idText 
+            ? `cars.html?name=${encodeURIComponent(searchText)}&id=${encodeURIComponent(idText)}`
+            : `cars.html?name=${encodeURIComponent(searchText)}`;
+            
+        window.location.href = url;
+        });
+    </script>
+</body>
+
+</html>
